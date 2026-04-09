@@ -21,6 +21,24 @@ const GENRE_KEYWORDS = {
   rock:      '밴드 락 rock',
 };
 
+/** 오늘 날짜를 숫자 시드로 반환 (매일 다른 셔플) */
+function getDaySeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+/** 시드 기반 결정적 셔플 (같은 날 = 같은 순서) */
+function seededShuffle(arr, seed) {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    const j = s % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 /**
  * 업무 입력을 YouTube 검색 쿼리 문자열로 변환한다.
  * @param {number} intensity  1|2|3
@@ -210,7 +228,7 @@ const intensity = parseInt(slider.value, 10);
 
     try {
       cachedItems = await fetchRecommendations(query);
-      renderResults(cachedItems.sort(() => Math.random() - 0.5).slice(0, 5));
+      renderResults(seededShuffle(cachedItems, getDaySeed()).slice(0, 5));
     } catch (err) {
       showError('API 오류가 발생했어요. API 키와 인터넷 연결을 확인해주세요.');
       console.error(err);
