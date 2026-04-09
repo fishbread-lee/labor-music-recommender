@@ -86,3 +86,61 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+/**
+ * 검색 결과 items로 결과 그리드를 렌더링한다.
+ * @param {object[]} items  YouTube API items
+ */
+function renderResults(items) {
+  const grid = document.getElementById('results-grid');
+  grid.innerHTML = '';
+
+  if (!items || items.length === 0) {
+    showError('추천 결과가 없어요. 장르를 바꿔보세요!');
+    return;
+  }
+
+  const [first, ...rest] = items;
+  grid.appendChild(createCard(first, true));
+
+  const subGrid = document.createElement('div');
+  subGrid.className = 'sub-grid';
+  rest.forEach(item => subGrid.appendChild(createCard(item, false)));
+  grid.appendChild(subGrid);
+}
+
+/**
+ * 단일 영상 카드 DOM 요소를 생성한다.
+ * @param {object} item       YouTube API item
+ * @param {boolean} featured  true면 1위 피처드 카드
+ * @returns {HTMLElement}
+ */
+function createCard(item, featured) {
+  const videoId = item.id.videoId;
+  const title = item.snippet.title;
+  const thumb = featured
+    ? (item.snippet.thumbnails.high?.url ?? item.snippet.thumbnails.medium?.url)
+    : item.snippet.thumbnails.medium?.url;
+  const href = `https://www.youtube.com/watch?v=${videoId}`;
+
+  const card = document.createElement('div');
+  card.className = featured ? 'result-card result-card--featured' : 'result-card';
+  card.innerHTML = `
+    <img class="card-thumb" src="${thumb}" alt="${escapeHtml(title)}" loading="lazy">
+    <div class="card-body">
+      <p class="card-title">${escapeHtml(title)}</p>
+      <a class="card-btn" href="${href}" target="_blank" rel="noopener noreferrer">▶ 열기</a>
+    </div>
+  `;
+  return card;
+}
+
+/**
+ * 에러 메시지를 표시한다.
+ * @param {string} msg
+ */
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.hidden = false;
+}
