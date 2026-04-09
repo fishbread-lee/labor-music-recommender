@@ -336,11 +336,14 @@ body {
   text-decoration: none;
   color: var(--text);
   white-space: nowrap;
-  margin-top: auto;
-  align-self: flex-start;
 }
 
 .card-btn:hover { background: var(--lavender); }
+
+.result-card .card-body .card-btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
 
 .hidden { display: none !important; }
 
@@ -380,10 +383,10 @@ body {
 .marquee-track {
   display: inline-block;
   white-space: nowrap;
-  color: #00BFFF;
+  color: var(--lavender);
   font-family: var(--font-pixel);
   font-size: 0.8rem;
-  text-shadow: 0 0 8px #00BFFF;
+  text-shadow: 0 0 8px var(--lavender);
   padding-right: 80px;
 }
 
@@ -421,7 +424,6 @@ body {
 
 .dj-input:focus {
   border-color: var(--lavender);
-  box-shadow: 0 0 0 2px rgba(0, 191, 255, 0.2);
 }
 
 .dj-send-btn {
@@ -435,7 +437,7 @@ body {
   white-space: nowrap;
 }
 
-.dj-send-btn:hover { opacity: 0.85; }
+.dj-send-btn:hover { background: var(--pink); }
 
 .dj-send-btn:active {
   box-shadow: none;
