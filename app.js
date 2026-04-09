@@ -21,13 +21,6 @@ const GENRE_KEYWORDS = {
   rock:      '밴드 락 rock',
 };
 
-/** 이번 주 시드 문자열 반환 (매주 다른 결과 유도) */
-function getWeekSeed() {
-  const now = new Date();
-  const week = Math.ceil(now.getDate() / 7);
-  return `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${week}주`;
-}
-
 /**
  * 업무 입력을 YouTube 검색 쿼리 문자열로 변환한다.
  * @param {number} intensity  1|2|3
@@ -40,8 +33,8 @@ function buildQuery(intensity, genre, memo) {
   if (!base) throw new RangeError(`Invalid intensity "${intensity}"`);
   const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
   const memoPart = (memo ?? '').trim().slice(0, 30);
-  const exclude = '-playlist -compilation -mix -"1 hour" -"2 hour"';
-  return [genrePart, base, memoPart, getWeekSeed(), exclude].filter(s => s.length > 0).join(' ');
+  const exclude = '-playlist -compilation -"1 hour" -"2 hour"';
+  return [genrePart, base, memoPart, exclude].filter(s => s.length > 0).join(' ');
 }
 
 /**
