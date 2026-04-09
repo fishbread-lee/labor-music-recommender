@@ -50,9 +50,16 @@ function buildQuery(intensity, genre, memo) {
   const base = QUERY_MAP[intensity];
   if (!base) throw new RangeError(`Invalid intensity "${intensity}"`);
   const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
+  // 장르 선택 시 베이스 키워드를 제외해 검색 혼선 방지
+  // 강도 3(높음)일 때만 instrumental 추가
+  const intensityMod = genre && intensity === 3 ? 'instrumental 가사없는' : '';
+  const hashtags = '#플리 #플레이리스트 #노래추천';
   const memoPart = (memo ?? '').trim().slice(0, 30);
   const exclude = '-shorts -"1 hour loop" -"2 hour loop"';
-  return [genrePart, base, memoPart, exclude].filter(s => s.length > 0).join(' ');
+  if (genre) {
+    return [genrePart, intensityMod, hashtags, memoPart, exclude].filter(s => s.length > 0).join(' ');
+  }
+  return [base, memoPart, exclude].filter(s => s.length > 0).join(' ');
 }
 
 /**
