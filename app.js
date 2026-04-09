@@ -51,7 +51,7 @@ function buildQuery(intensity, genre, memo) {
   if (!base) throw new RangeError(`Invalid intensity "${intensity}"`);
   const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
   const memoPart = (memo ?? '').trim().slice(0, 30);
-  const exclude = '-playlist -compilation -"1 hour" -"2 hour"';
+  const exclude = '-shorts -playlist -compilation -"1 hour" -"2 hour"';
   return [genrePart, base, memoPart, exclude].filter(s => s.length > 0).join(' ');
 }
 
