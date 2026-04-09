@@ -51,7 +51,7 @@ function buildQuery(intensity, genre, memo) {
   if (!base) throw new RangeError(`Invalid intensity "${intensity}"`);
   const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
   const memoPart = (memo ?? '').trim().slice(0, 30);
-  const exclude = '-shorts -playlist -compilation -"1 hour" -"2 hour"';
+  const exclude = '-shorts -"1 hour" -"2 hour"';
   return [genrePart, base, memoPart, exclude].filter(s => s.length > 0).join(' ');
 }
 
@@ -61,7 +61,7 @@ function buildQuery(intensity, genre, memo) {
  * @returns {Promise<object[]>} snippet 포함 items 배열
  */
 async function fetchRecommendations(query) {
-  const orders = ['relevance', 'rating', 'viewCount'];
+  const orders = ['rating', 'viewCount'];
   const order = orders[Math.floor(Math.random() * orders.length)];
 
   const url = new URL('/api/search', location.origin);
