@@ -58,7 +58,7 @@ async function fetchRecommendations(query) {
   url.searchParams.set('part', 'snippet');
   url.searchParams.set('type', 'video');
   url.searchParams.set('videoCategoryId', '10');
-  url.searchParams.set('maxResults', '25');
+  url.searchParams.set('maxResults', '50');
   url.searchParams.set('order', order);
   url.searchParams.set('q', query);
   url.searchParams.set('key', YOUTUBE_API_KEY);
@@ -69,10 +69,7 @@ async function fetchRecommendations(query) {
     throw new Error(err?.error?.message || `HTTP ${res.status}`);
   }
   const data = await res.json();
-  const items = data.items ?? [];
-
-  // 25개 중 랜덤으로 5개 선택
-  return items.sort(() => Math.random() - 0.5).slice(0, 5);
+  return data.items ?? [];
 }
 
 /**
@@ -174,6 +171,7 @@ function loadPrefs() {
 
 // ── 상태 ──
 let selectedGenre = null;
+let cachedItems = [];
 
 // ── 초기화 ──
 document.addEventListener('DOMContentLoaded', () => {
@@ -184,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const resultsSection = document.getElementById('results-section');
   const loadingMsg = document.getElementById('loading-msg');
   const errorMsg = document.getElementById('error-msg');
+  const shuffleBtn = document.getElementById('shuffle-btn');
 
   // 슬라이더: 강도 레이블 업데이트
   slider.addEventListener('input', () => {
@@ -228,8 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
     recommendBtn.disabled = true;
 
     try {
-      const items = await fetchRecommendations(query);
-      renderResults(items);
+      cachedItems = await fetchRecommendations(query);
+      renderResults(cachedItems.sort(() => Math.random() - 0.5).slice(0, 5));
     } catch (err) {
       showError('API 오류가 발생했어요. API 키와 인터넷 연결을 확인해주세요.');
       console.error(err);
@@ -238,6 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
       recommendBtn.disabled = false;
       resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
+  });
+
+  // 새로고침 버튼 — 캐시된 풀에서 다시 셔플
+  shuffleBtn.addEventListener('click', () => {
+    if (cachedItems.length === 0) return;
+    errorMsg.hidden = true;
+    renderResults([...cachedItems].sort(() => Math.random() - 0.5).slice(0, 5));
   });
 
   // 취향 복원

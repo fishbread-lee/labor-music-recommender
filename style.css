@@ -336,6 +336,25 @@ body {
 
 .hidden { display: none !important; }
 
+/* ── 새로고침 버튼 ── */
+.shuffle-btn {
+  align-self: center;
+  padding: 10px 28px;
+  background: var(--lavender);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  font-size: 0.8rem;
+  font-family: var(--font-pixel);
+  margin-top: 8px;
+}
+
+.shuffle-btn:hover { background: var(--pink); }
+
+.shuffle-btn:active {
+  box-shadow: none;
+  transform: translate(4px, 4px);
+}
+
 /* ── 반응형 ── */
 @media (max-width: 480px) {
   .sub-grid { grid-template-columns: 1fr; }
