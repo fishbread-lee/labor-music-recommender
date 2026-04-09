@@ -43,8 +43,9 @@ const GENRE_KEYWORDS = {
  * @returns {string}
  */
 function buildQuery(intensity, workType, genres, memo) {
-  const base = QUERY_MAP[intensity][workType];
+  const base = QUERY_MAP[intensity]?.[workType];
+  if (!base) throw new RangeError(`Invalid intensity "${intensity}" or workType "${workType}"`);
   const genrePart = genres.map(g => GENRE_KEYWORDS[g]).filter(Boolean).join(' ');
-  const memoPart = memo.trim().slice(0, 30);
+  const memoPart = (memo ?? '').trim().slice(0, 30);
   return [base, genrePart, memoPart, 'playlist'].filter(s => s.length > 0).join(' ');
 }
