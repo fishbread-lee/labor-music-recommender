@@ -2,9 +2,9 @@
 const INTENSITY_LABELS = { 1: '낮음', 2: '보통', 3: '높음' };
 
 const QUERY_MAP = {
-  1: '신나는 노래 가사 빠른 비트',   // 낮음: 신나고 가사 있는 노래
-  2: '인기 노래 감성',               // 보통: 평범한 일반 노래
-  3: '가사없는 집중 음악 instrumental', // 높음: 가사 없는 집중 음악
+  1: '신나는 노래 가사 인기 #플리 #플레이리스트 #노래추천',
+  2: '인기 노래 감성 노동요 #플리 #플레이리스트 #노래추천',
+  3: 'instrumental 집중 가사없는 study #플리 #플레이리스트 #노래추천',
 };
 
 const GENRE_KEYWORDS = {
@@ -51,7 +51,7 @@ function buildQuery(intensity, genre, memo) {
   if (!base) throw new RangeError(`Invalid intensity "${intensity}"`);
   const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
   const memoPart = (memo ?? '').trim().slice(0, 30);
-  const exclude = '-shorts -"1 hour" -"2 hour"';
+  const exclude = '-shorts -"1 hour loop" -"2 hour loop"';
   return [genrePart, base, memoPart, exclude].filter(s => s.length > 0).join(' ');
 }
 
@@ -88,6 +88,80 @@ function escapeHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+/**
+ * 전광판 두 트랙의 텍스트를 동일하게 업데이트한다.
+ */
+function updateMarquee() {
+  const text = marqueeMessages.length > 0
+    ? marqueeMessages.join('  ✦  ')
+    : '🎵 DJ BOARD — 메시지를 남겨보세요';
+  const t1 = document.getElementById('marquee-track-1');
+  const t2 = document.getElementById('marquee-track-2');
+  if (t1) t1.textContent = text;
+  if (t2) t2.textContent = text;
+}
+
+/**
+ * Supabase에서 최근 메시지 50개를 가져와 전광판을 초기화한다.
+ */
+async function loadMessages() {
+  const { data, error } = await supabaseClient
+    .from('messages')
+    .select('content')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) { console.error('loadMessages error:', error); return; }
+  marqueeMessages = (data || []).map(m => m.content).reverse();
+  updateMarquee();
+}
+
+/**
+ * Supabase Realtime INSERT 이벤트를 구독해 전광판을 실시간 업데이트한다.
+ */
+function subscribeMessages() {
+  supabaseClient
+    .channel('public:messages')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages' },
+      payload => {
+        marqueeMessages.push(payload.new.content);
+        if (marqueeMessages.length > 50) marqueeMessages.shift();
+        updateMarquee();
+      }
+    )
+    .subscribe();
+}
+
+/**
+ * /api/config에서 Supabase 크리덴셜을 가져와 클라이언트를 초기화한다.
+ */
+async function initSupabase() {
+  try {
+    const res = await fetch('/api/config');
+    if (!res.ok) return;
+    const { supabaseUrl, supabaseAnonKey } = await res.json();
+    supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+    await loadMessages();
+    subscribeMessages();
+  } catch (err) {
+    console.error('Supabase init failed:', err);
+  }
+}
+
+/**
+ * 메시지를 Supabase messages 테이블에 저장한다.
+ * @param {string} content
+ */
+async function sendMessage(content) {
+  if (!supabaseClient || !content.trim()) return;
+  const { error } = await supabaseClient
+    .from('messages')
+    .insert({ content: content.trim() });
+  if (error) console.error('sendMessage error:', error);
 }
 
 /**
@@ -174,6 +248,10 @@ function loadPrefs() {
   }
 }
 
+// ── Supabase ──
+let supabaseClient = null;
+let marqueeMessages = [];
+
 // ── 상태 ──
 let selectedGenre = null;
 let cachedItems = [];
@@ -259,4 +337,27 @@ const intensity = parseInt(slider.value, 10);
       selectedGenre = prefs.genre;
     }
   }
+
+  // DJ 전광판 메시지 전송
+  const djInput = document.getElementById('dj-input');
+  const djSendBtn = document.getElementById('dj-send-btn');
+
+  if (djSendBtn) {
+    djSendBtn.addEventListener('click', async () => {
+      const content = djInput.value.trim();
+      if (!content) return;
+      djSendBtn.disabled = true;
+      await sendMessage(content);
+      djInput.value = '';
+      djSendBtn.disabled = false;
+      djInput.focus();
+    });
+
+    djInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') djSendBtn.click();
+    });
+  }
+
+  // Supabase 초기화 (전광판 활성화)
+  initSupabase();
 });
