@@ -50,8 +50,9 @@ function buildQuery(intensity, workType, genre, memo) {
   if (!base) throw new RangeError(`Invalid intensity "${intensity}" or workType "${workType}"`);
   const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
   const memoPart = (memo ?? '').trim().slice(0, 30);
-  // 장르를 앞에 배치해 YouTube 검색 우선순위를 높임
-  return [genrePart, base, memoPart].filter(s => s.length > 0).join(' ');
+  // 장르를 앞에 배치, 플레이리스트/컴필레이션 제외
+  const exclude = '-playlist -compilation -mix -"1 hour" -"2 hour"';
+  return [genrePart, base, memoPart, exclude].filter(s => s.length > 0).join(' ');
 }
 
 /**
