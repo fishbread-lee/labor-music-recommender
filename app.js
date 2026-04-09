@@ -2,9 +2,9 @@
 const INTENSITY_LABELS = { 1: '낮음', 2: '보통', 3: '높음' };
 
 const QUERY_MAP = {
-  1: '신나는 노래 가사 인기 #플리 #플레이리스트 #노래추천',
-  2: '인기 노래 감성 노동요 #플리 #플레이리스트 #노래추천',
-  3: 'instrumental 집중 가사없는 study #플리 #플레이리스트 #노래추천',
+  1: '신나는 인기 #플리 #플레이리스트 #노래추천',
+  2: '감성 노동요 #플리 #플레이리스트 #노래추천',
+  3: '집중 study #플리 #플레이리스트 #노래추천',
 };
 
 const GENRE_KEYWORDS = {
@@ -50,9 +50,8 @@ function buildQuery(intensity, genre, memo) {
   const base = QUERY_MAP[intensity];
   if (!base) throw new RangeError(`Invalid intensity "${intensity}"`);
   const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
-  // 장르 선택 시 베이스 키워드를 제외해 검색 혼선 방지
-  // 강도 3(높음)일 때만 instrumental 추가
-  const intensityMod = genre && intensity === 3 ? 'instrumental 가사없는' : '';
+  // 장르 선택 시 강도 3(높음)이면 집중 힌트 추가
+  const intensityMod = genre && intensity === 3 ? '집중 study' : '';
   const hashtags = '#플리 #플레이리스트 #노래추천';
   const memoPart = (memo ?? '').trim().slice(0, 30);
   const exclude = '-shorts -"1 hour loop" -"2 hour loop"';
