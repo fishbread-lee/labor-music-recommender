@@ -119,6 +119,14 @@ body {
   cursor: pointer;
 }
 
+.pixel-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--pink);
+  border: var(--border);
+  cursor: pointer;
+}
+
 .slider-value {
   font-family: var(--font-pixel);
   font-size: 0.75rem;
@@ -183,7 +191,7 @@ body {
 }
 
 .genre-badge.active {
-  border-width: 3px;
+  border-width: 4px;
   box-shadow: none;
   transform: translate(2px, 2px);
   filter: saturate(1.4);
@@ -205,6 +213,13 @@ body {
 }
 
 .recommend-btn:active {
+  box-shadow: none;
+  transform: translate(4px, 4px);
+}
+
+.recommend-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
   box-shadow: none;
   transform: translate(4px, 4px);
 }
@@ -318,6 +333,8 @@ body {
 }
 
 .card-btn:hover { background: var(--lavender); }
+
+.hidden { display: none !important; }
 
 /* ── 반응형 ── */
 @media (max-width: 480px) {

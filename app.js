@@ -122,7 +122,8 @@ function createCard(item, featured) {
   const thumb = featured
     ? (thumbnails.high?.url ?? thumbnails.medium?.url ?? '')
     : (thumbnails.medium?.url ?? '');
-  const href = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+  const safeVideoId = String(videoId).replace(/[^a-zA-Z0-9_-]/g, '');
+  const href = `https://www.youtube.com/watch?v=${safeVideoId}`;
 
   const card = document.createElement('div');
   card.className = featured ? 'result-card result-card--featured' : 'result-card';
@@ -214,6 +215,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 추천받기 버튼
   recommendBtn.addEventListener('click', async () => {
+    if (YOUTUBE_API_KEY === 'YOUR_API_KEY_HERE') {
+      showError('API 키가 설정되지 않았어요. app.js의 YOUTUBE_API_KEY를 입력해주세요.');
+      resultsSection.classList.remove('hidden');
+      return;
+    }
     const intensity = parseInt(slider.value, 10);
     const memo = document.getElementById('memo').value;
 
@@ -222,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const query = buildQuery(intensity, selectedWorkType, selectedGenres, memo);
 
     // UI 초기화
-    resultsSection.hidden = false;
+    resultsSection.classList.remove('hidden');
     loadingMsg.hidden = false;
     errorMsg.hidden = true;
     document.getElementById('results-grid').innerHTML = '';
