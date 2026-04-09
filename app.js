@@ -1,4 +1,3 @@
-const YOUTUBE_API_KEY = 'AIzaSyBAt4pg_N-0mWmZ4NglBoXNLkAlu4PDQcc';
 
 const INTENSITY_LABELS = { 1: '낮음', 2: '보통', 3: '높음' };
 
@@ -54,19 +53,14 @@ async function fetchRecommendations(query) {
   const orders = ['relevance', 'rating', 'viewCount'];
   const order = orders[Math.floor(Math.random() * orders.length)];
 
-  const url = new URL('https://www.googleapis.com/youtube/v3/search');
-  url.searchParams.set('part', 'snippet');
-  url.searchParams.set('type', 'video');
-  url.searchParams.set('videoCategoryId', '10');
-  url.searchParams.set('maxResults', '50');
-  url.searchParams.set('order', order);
+  const url = new URL('/api/search', location.origin);
   url.searchParams.set('q', query);
-  url.searchParams.set('key', YOUTUBE_API_KEY);
+  url.searchParams.set('order', order);
 
   const res = await fetch(url.toString());
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+    throw new Error(err?.error || `HTTP ${res.status}`);
   }
   const data = await res.json();
   return data.items ?? [];
@@ -207,12 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 추천받기 버튼
   recommendBtn.addEventListener('click', async () => {
-    if (YOUTUBE_API_KEY === 'YOUR_API_KEY_HERE') {
-      showError('API 키가 설정되지 않았어요. app.js의 YOUTUBE_API_KEY를 입력해주세요.');
-      resultsSection.classList.remove('hidden');
-      return;
-    }
-    const intensity = parseInt(slider.value, 10);
+const intensity = parseInt(slider.value, 10);
     const memo = document.getElementById('memo').value;
 
     savePrefs({ intensity, genre: selectedGenre });
