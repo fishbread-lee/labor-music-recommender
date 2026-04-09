@@ -49,3 +49,40 @@ function buildQuery(intensity, workType, genres, memo) {
   const memoPart = (memo ?? '').trim().slice(0, 30);
   return [base, genrePart, memoPart, 'playlist'].filter(s => s.length > 0).join(' ');
 }
+
+/**
+ * YouTube Data API v3 search.list 호출.
+ * @param {string} query
+ * @returns {Promise<object[]>} snippet 포함 items 배열
+ */
+async function fetchRecommendations(query) {
+  const url = new URL('https://www.googleapis.com/youtube/v3/search');
+  url.searchParams.set('part', 'snippet');
+  url.searchParams.set('type', 'video');
+  url.searchParams.set('videoCategoryId', '10');
+  url.searchParams.set('maxResults', '5');
+  url.searchParams.set('order', 'relevance');
+  url.searchParams.set('q', query);
+  url.searchParams.set('key', YOUTUBE_API_KEY);
+
+  const res = await fetch(url.toString());
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.items ?? [];
+}
+
+/**
+ * HTML 특수문자를 이스케이프한다.
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
