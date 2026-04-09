@@ -42,12 +42,13 @@ const GENRE_KEYWORDS = {
  * @param {string} memo       자유 텍스트 (선택)
  * @returns {string}
  */
-function buildQuery(intensity, workType, genres, memo) {
+function buildQuery(intensity, workType, genre, memo) {
   const base = QUERY_MAP[intensity]?.[workType];
   if (!base) throw new RangeError(`Invalid intensity "${intensity}" or workType "${workType}"`);
-  const genrePart = genres.map(g => GENRE_KEYWORDS[g]).filter(Boolean).join(' ');
+  const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
   const memoPart = (memo ?? '').trim().slice(0, 30);
-  return [base, genrePart, memoPart, 'playlist'].filter(s => s.length > 0).join(' ');
+  // 장르를 앞에 배치해 YouTube 검색 우선순위를 높임
+  return [genrePart, base, memoPart].filter(s => s.length > 0).join(' ');
 }
 
 /**
@@ -173,7 +174,7 @@ function loadPrefs() {
 
 // ── 상태 ──
 let selectedWorkType = 'focus';
-let selectedGenres = [];
+let selectedGenre = null;
 
 // ── 초기화 ──
 document.addEventListener('DOMContentLoaded', () => {
@@ -200,16 +201,19 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedWorkType = btn.dataset.value;
   });
 
-  // 장르 뱃지 멀티 선택
+  // 장르 뱃지 단일 선택
   genreGrid.addEventListener('click', e => {
     const badge = e.target.closest('.genre-badge');
     if (!badge) return;
-    badge.classList.toggle('active');
     const genre = badge.dataset.genre;
-    if (selectedGenres.includes(genre)) {
-      selectedGenres = selectedGenres.filter(g => g !== genre);
+    if (selectedGenre === genre) {
+      // 같은 장르 다시 클릭 → 선택 해제
+      badge.classList.remove('active');
+      selectedGenre = null;
     } else {
-      selectedGenres.push(genre);
+      genreGrid.querySelectorAll('.genre-badge').forEach(b => b.classList.remove('active'));
+      badge.classList.add('active');
+      selectedGenre = genre;
     }
   });
 
@@ -223,9 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const intensity = parseInt(slider.value, 10);
     const memo = document.getElementById('memo').value;
 
-    savePrefs({ intensity, workType: selectedWorkType, genres: selectedGenres });
+    savePrefs({ intensity, workType: selectedWorkType, genre: selectedGenre });
 
-    const query = buildQuery(intensity, selectedWorkType, selectedGenres, memo);
+    const query = buildQuery(intensity, selectedWorkType, selectedGenre, memo);
 
     // UI 초기화
     resultsSection.classList.remove('hidden');
@@ -260,12 +264,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       selectedWorkType = prefs.workType;
     }
-    if (Array.isArray(prefs.genres)) {
-      prefs.genres.forEach(g => {
-        const badge = genreGrid.querySelector(`.genre-badge[data-genre="${g}"]`);
-        if (badge) badge.classList.add('active');
-      });
-      selectedGenres = prefs.genres;
+    if (prefs.genre) {
+      const badge = genreGrid.querySelector(`.genre-badge[data-genre="${prefs.genre}"]`);
+      if (badge) badge.classList.add('active');
+      selectedGenre = prefs.genre;
     }
   }
 });
