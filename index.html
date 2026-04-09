@@ -10,6 +10,12 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="marquee-section">
+    <div class="marquee-wrap">
+      <span class="marquee-track" id="marquee-track-1">🎵 DJ BOARD — 메시지를 남겨보세요</span>
+      <span class="marquee-track" id="marquee-track-2">🎵 DJ BOARD — 메시지를 남겨보세요</span>
+    </div>
+  </div>
   <div class="container">
 
     <header class="header">
@@ -38,17 +44,17 @@
       <div class="field-group">
         <label class="field-label">장르 <span class="optional">(선택)</span></label>
         <div class="genre-grid" id="genres">
-          <button type="button" class="genre-badge" data-genre="lofi" style="--badge-bg:#b8d4e8;">🌙 lofi / chill</button>
-          <button type="button" class="genre-badge" data-genre="jazz" style="--badge-bg:#e8d4b8;">🎷 재즈 / 보사노바</button>
-          <button type="button" class="genre-badge" data-genre="classical" style="--badge-bg:#e8e8d4;">🎻 클래식</button>
-          <button type="button" class="genre-badge" data-genre="synth" style="--badge-bg:#d4b8e8;">🔊 신스팝 / 일렉트로닉</button>
-          <button type="button" class="genre-badge" data-genre="game" style="--badge-bg:#b8e8d4;">🎮 게임OST / 애니OST</button>
-          <button type="button" class="genre-badge" data-genre="kindic" style="--badge-bg:#e8b8d4;">🌿 K-인디</button>
-          <button type="button" class="genre-badge" data-genre="citypop" style="--badge-bg:#fcd4b8;">🌆 시티팝</button>
-          <button type="button" class="genre-badge" data-genre="hiphop" style="--badge-bg:#d4d4e8;">🎤 힙합 / R&amp;B</button>
-          <button type="button" class="genre-badge" data-genre="kpop" style="--badge-bg:#f4b8c1;">💫 K-팝</button>
-          <button type="button" class="genre-badge" data-genre="jpop" style="--badge-bg:#fce4b8;">🌸 J-팝</button>
-          <button type="button" class="genre-badge" data-genre="rock" style="--badge-bg:#c8c8c8;">🎸 밴드 / 락</button>
+          <button type="button" class="genre-badge" data-genre="lofi" style="--badge-bg:#E8E8E8;">🌙 lofi / chill</button>
+          <button type="button" class="genre-badge" data-genre="jazz" style="--badge-bg:#E8E8E8;">🎷 재즈 / 보사노바</button>
+          <button type="button" class="genre-badge" data-genre="classical" style="--badge-bg:#E8E8E8;">🎻 클래식</button>
+          <button type="button" class="genre-badge" data-genre="synth" style="--badge-bg:#E8E8E8;">🔊 신스팝 / 일렉트로닉</button>
+          <button type="button" class="genre-badge" data-genre="game" style="--badge-bg:#E8E8E8;">🎮 게임OST / 애니OST</button>
+          <button type="button" class="genre-badge" data-genre="kindic" style="--badge-bg:#E8E8E8;">🌿 K-인디</button>
+          <button type="button" class="genre-badge" data-genre="citypop" style="--badge-bg:#E8E8E8;">🌆 시티팝</button>
+          <button type="button" class="genre-badge" data-genre="hiphop" style="--badge-bg:#E8E8E8;">🎤 힙합 / R&amp;B</button>
+          <button type="button" class="genre-badge" data-genre="kpop" style="--badge-bg:#E8E8E8;">💫 K-팝</button>
+          <button type="button" class="genre-badge" data-genre="jpop" style="--badge-bg:#E8E8E8;">🌸 J-팝</button>
+          <button type="button" class="genre-badge" data-genre="rock" style="--badge-bg:#E8E8E8;">🎸 밴드 / 락</button>
         </div>
       </div>
 
@@ -63,7 +69,22 @@
       <button type="button" class="shuffle-btn" id="shuffle-btn">🔀 다른 노래 추천</button>
     </section>
 
+    <section class="dj-input-section" id="dj-input-section">
+      <p class="field-label">📻 전광판에 남기기</p>
+      <div class="dj-input-row">
+        <input
+          type="text"
+          id="dj-input"
+          class="dj-input"
+          maxlength="40"
+          placeholder="추천곡이나 메시지를 남겨보세요 (최대 40자)"
+        >
+        <button type="button" class="dj-send-btn" id="dj-send-btn">전송</button>
+      </div>
+    </section>
+
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>
