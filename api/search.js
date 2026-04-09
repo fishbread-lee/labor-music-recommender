@@ -19,6 +19,8 @@ export default async function handler(req, res) {
   url.searchParams.set('videoCategoryId', '10'); // 음악 카테고리만
   url.searchParams.set('maxResults', '50');
   url.searchParams.set('order', safeOrder);
+  url.searchParams.set('videoDuration', 'long');
+  url.searchParams.set('relevanceLanguage', 'ko');
   url.searchParams.set('q', q);
   url.searchParams.set('key', process.env.YOUTUBE_API_KEY);
 
