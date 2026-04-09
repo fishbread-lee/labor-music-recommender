@@ -5,36 +5,36 @@ const INTENSITY_LABELS = { 1: '낮음', 2: '보통', 3: '높음' };
 const QUERY_MAP = {
   // 낮음: 가사 있고 신나는 노래, 빠른 비트
   1: {
-    focus:    'upbeat lyrics fast beat work songs',
-    repeat:   'energetic catchy songs fast tempo',
-    creative: 'fun upbeat vocal songs light work',
+    focus:    '신나는 노래 가사 빠른 비트',
+    repeat:   '신나는 인기 노래 빠른 템포',
+    creative: '밝고 신나는 노래 가사',
   },
   // 보통: 평범한 일반 노래
   2: {
-    focus:    'popular vocal songs work background',
-    repeat:   'pop songs steady background music',
-    creative: 'vocal music chill vibe',
+    focus:    '인기 노래 가사',
+    repeat:   '인기 노래 배경음악',
+    creative: '감성 노래',
   },
   // 높음: 가사 없는 집중 음악
   3: {
-    focus:    'instrumental no lyrics deep focus concentration',
-    repeat:   'no vocals instrumental steady focus music',
-    creative: 'ambient instrumental no lyrics concentration',
+    focus:    '가사없는 집중 음악 instrumental',
+    repeat:   '집중 공부 음악 가사없음',
+    creative: '잔잔한 집중 배경음악 instrumental',
   },
 };
 
 const GENRE_KEYWORDS = {
-  lofi:      'lofi',
-  jazz:      'jazz bossa nova',
-  classical: 'classical',
-  synth:     'synthpop electronic',
-  game:      'game ost anime soundtrack',
-  kindic:    'korean indie',
-  citypop:   'city pop',
-  hiphop:    'hip hop r&b',
-  kpop:      'kpop',
-  jpop:      'jpop',
-  rock:      'band rock music',
+  lofi:      'lofi 감성',
+  jazz:      '재즈 보사노바',
+  classical: '클래식 음악',
+  synth:     '신스팝 일렉트로닉',
+  game:      '게임 OST 애니 OST',
+  kindic:    '한국 인디 음악',
+  citypop:   '시티팝',
+  hiphop:    '힙합 R&B',
+  kpop:      '케이팝 kpop',
+  jpop:      '제이팝 jpop',
+  rock:      '밴드 락 rock',
 };
 
 /**
