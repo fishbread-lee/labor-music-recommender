@@ -20,7 +20,7 @@
     <section class="input-section">
 
       <div class="field-group">
-        <label class="field-label">업무 강도</label>
+        <label class="field-label" for="intensity">업무 강도</label>
         <div class="slider-row">
           <span class="slider-cap">낮음</span>
           <input type="range" id="intensity" min="1" max="3" value="2" step="1" class="pixel-slider">
@@ -32,35 +32,35 @@
       <div class="field-group">
         <label class="field-label">업무 종류</label>
         <div class="toggle-group" id="work-type">
-          <button class="toggle-btn active" data-value="focus">집중형</button>
-          <button class="toggle-btn" data-value="repeat">반복형</button>
-          <button class="toggle-btn" data-value="creative">창의형</button>
+          <button type="button" class="toggle-btn active" data-value="focus">집중형</button>
+          <button type="button" class="toggle-btn" data-value="repeat">반복형</button>
+          <button type="button" class="toggle-btn" data-value="creative">창의형</button>
         </div>
       </div>
 
       <div class="field-group">
-        <label class="field-label">업무 메모 <span class="optional">(선택)</span></label>
+        <label class="field-label" for="memo">업무 메모 <span class="optional">(선택)</span></label>
         <textarea id="memo" class="pixel-textarea" placeholder="오늘 어떤 업무를 하나요?"></textarea>
       </div>
 
       <div class="field-group">
         <label class="field-label">장르 <span class="optional">(선택)</span></label>
         <div class="genre-grid" id="genres">
-          <button class="genre-badge" data-genre="lofi" style="--badge-bg:#b8d4e8;">🌙 lofi / chill</button>
-          <button class="genre-badge" data-genre="jazz" style="--badge-bg:#e8d4b8;">🎷 재즈 / 보사노바</button>
-          <button class="genre-badge" data-genre="classical" style="--badge-bg:#e8e8d4;">🎻 클래식</button>
-          <button class="genre-badge" data-genre="synth" style="--badge-bg:#d4b8e8;">🔊 신스팝 / 일렉트로닉</button>
-          <button class="genre-badge" data-genre="game" style="--badge-bg:#b8e8d4;">🎮 게임OST / 애니OST</button>
-          <button class="genre-badge" data-genre="kindic" style="--badge-bg:#e8b8d4;">🌿 K-인디</button>
-          <button class="genre-badge" data-genre="citypop" style="--badge-bg:#fcd4b8;">🌆 시티팝</button>
-          <button class="genre-badge" data-genre="hiphop" style="--badge-bg:#d4d4e8;">🎤 힙합 / R&amp;B</button>
-          <button class="genre-badge" data-genre="kpop" style="--badge-bg:#f4b8c1;">💫 K-팝</button>
-          <button class="genre-badge" data-genre="jpop" style="--badge-bg:#fce4b8;">🌸 J-팝</button>
-          <button class="genre-badge" data-genre="rock" style="--badge-bg:#c8c8c8;">🎸 밴드 / 락</button>
+          <button type="button" class="genre-badge" data-genre="lofi" style="--badge-bg:#b8d4e8;">🌙 lofi / chill</button>
+          <button type="button" class="genre-badge" data-genre="jazz" style="--badge-bg:#e8d4b8;">🎷 재즈 / 보사노바</button>
+          <button type="button" class="genre-badge" data-genre="classical" style="--badge-bg:#e8e8d4;">🎻 클래식</button>
+          <button type="button" class="genre-badge" data-genre="synth" style="--badge-bg:#d4b8e8;">🔊 신스팝 / 일렉트로닉</button>
+          <button type="button" class="genre-badge" data-genre="game" style="--badge-bg:#b8e8d4;">🎮 게임OST / 애니OST</button>
+          <button type="button" class="genre-badge" data-genre="kindic" style="--badge-bg:#e8b8d4;">🌿 K-인디</button>
+          <button type="button" class="genre-badge" data-genre="citypop" style="--badge-bg:#fcd4b8;">🌆 시티팝</button>
+          <button type="button" class="genre-badge" data-genre="hiphop" style="--badge-bg:#d4d4e8;">🎤 힙합 / R&amp;B</button>
+          <button type="button" class="genre-badge" data-genre="kpop" style="--badge-bg:#f4b8c1;">💫 K-팝</button>
+          <button type="button" class="genre-badge" data-genre="jpop" style="--badge-bg:#fce4b8;">🌸 J-팝</button>
+          <button type="button" class="genre-badge" data-genre="rock" style="--badge-bg:#c8c8c8;">🎸 밴드 / 락</button>
         </div>
       </div>
 
-      <button class="recommend-btn" id="recommend-btn">▶ 추천받기</button>
+      <button type="button" class="recommend-btn" id="recommend-btn">▶ 추천받기</button>
 
     </section>
 
