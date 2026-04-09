@@ -24,8 +24,13 @@ export default async function handler(req, res) {
   url.searchParams.set('q', q);
   url.searchParams.set('key', process.env.YOUTUBE_API_KEY);
 
-  const ytRes = await fetch(url.toString());
-  const data = await ytRes.json();
+  let ytRes, data;
+  try {
+    ytRes = await fetch(url.toString());
+    data = await ytRes.json();
+  } catch {
+    return res.status(502).json({ error: 'YouTube API unreachable' });
+  }
 
   if (!ytRes.ok) {
     return res.status(ytRes.status).json({ error: data?.error?.message || 'YouTube API error' });

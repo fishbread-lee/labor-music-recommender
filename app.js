@@ -142,14 +142,25 @@ function subscribeMessages() {
 async function initSupabase() {
   try {
     const res = await fetch('/api/config');
-    if (!res.ok) return;
+    if (!res.ok) {
+      disableDjInput();
+      return;
+    }
     const { supabaseUrl, supabaseAnonKey } = await res.json();
     supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
     await loadMessages();
     subscribeMessages();
   } catch (err) {
     console.error('Supabase init failed:', err);
+    disableDjInput();
   }
+}
+
+function disableDjInput() {
+  const btn = document.getElementById('dj-send-btn');
+  const input = document.getElementById('dj-input');
+  if (btn) { btn.disabled = true; btn.textContent = '연결 안됨'; }
+  if (input) { input.disabled = true; input.placeholder = '전광판을 사용할 수 없어요'; }
 }
 
 /**
@@ -237,7 +248,7 @@ function savePrefs(prefs) {
 
 /**
  * localStorage에서 취향을 복원한다.
- * @returns {{ intensity: number, workType: string, genres: string[] } | null}
+ * @returns {{ intensity: number, genre: string | null } | null}
  */
 function loadPrefs() {
   try {
