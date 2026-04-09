@@ -146,3 +146,26 @@ function showError(msg) {
   el.textContent = msg;
   el.hidden = false;
 }
+
+const PREFS_KEY = 'ndr_prefs';
+
+/**
+ * 취향을 localStorage에 저장한다.
+ * @param {{ intensity: number, workType: string, genres: string[] }} prefs
+ */
+function savePrefs(prefs) {
+  localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+}
+
+/**
+ * localStorage에서 취향을 복원한다.
+ * @returns {{ intensity: number, workType: string, genres: string[] } | null}
+ */
+function loadPrefs() {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
