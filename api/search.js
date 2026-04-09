@@ -16,6 +16,7 @@ export default async function handler(req, res) {
   const url = new URL('https://www.googleapis.com/youtube/v3/search');
   url.searchParams.set('part', 'snippet');
   url.searchParams.set('type', 'video');
+  url.searchParams.set('videoCategoryId', '10'); // 음악 카테고리만
   url.searchParams.set('maxResults', '50');
   url.searchParams.set('order', safeOrder);
   url.searchParams.set('q', q);
