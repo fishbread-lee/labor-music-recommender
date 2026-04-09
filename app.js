@@ -1,4 +1,4 @@
-const YOUTUBE_API_KEY = 'YOUR_API_KEY_HERE'; // 여기에 실제 키 입력
+const YOUTUBE_API_KEY = 'AIzaSyBAt4pg_N-0mWmZ4NglBoXNLkAlu4PDQcc';
 
 const INTENSITY_LABELS = { 1: '낮음', 2: '보통', 3: '높음' };
 
