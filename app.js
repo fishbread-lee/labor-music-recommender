@@ -3,20 +3,23 @@ const YOUTUBE_API_KEY = 'AIzaSyBAt4pg_N-0mWmZ4NglBoXNLkAlu4PDQcc';
 const INTENSITY_LABELS = { 1: '낮음', 2: '보통', 3: '높음' };
 
 const QUERY_MAP = {
+  // 낮음: 가사 있고 신나는 노래, 빠른 비트
   1: {
-    focus: 'calm focus music',
-    repeat: 'light background music',
-    creative: 'chill creative music',
+    focus:    'upbeat lyrics fast beat work songs',
+    repeat:   'energetic catchy songs fast tempo',
+    creative: 'fun upbeat vocal songs light work',
   },
+  // 보통: 평범한 일반 노래
   2: {
-    focus: 'focus work music',
-    repeat: 'steady background music',
-    creative: 'creative flow music',
+    focus:    'popular vocal songs work background',
+    repeat:   'pop songs steady background music',
+    creative: 'vocal music chill vibe',
   },
+  // 높음: 가사 없는 집중 음악
   3: {
-    focus: 'deep focus concentration music',
-    repeat: 'energetic upbeat work music',
-    creative: 'inspiring intense music',
+    focus:    'instrumental no lyrics deep focus concentration',
+    repeat:   'no vocals instrumental steady focus music',
+    creative: 'ambient instrumental no lyrics concentration',
   },
 };
 
