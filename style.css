@@ -1,13 +1,13 @@
 /* ── 변수 ── */
 :root {
-  --bg: #fce4d6;
-  --lavender: #c9b8e8;
-  --pink: #f4b8c1;
+  --bg: #F4F4F4;
+  --lavender: #00BFFF;
+  --pink: #E0E0E0;
   --card: #ffffff;
-  --text: #2d2d2d;
-  --border: 2px solid #2d2d2d;
-  --shadow: 4px 4px 0 #2d2d2d;
-  --shadow-sm: 2px 2px 0 #2d2d2d;
+  --text: #1A1A1A;
+  --border: 2px solid #1A1A1A;
+  --shadow: 4px 4px 0 #1A1A1A;
+  --shadow-sm: 2px 2px 0 #1A1A1A;
   --font-pixel: 'Galmuri11', monospace;
   --font-body: 'Noto Sans KR', sans-serif;
   --radius: 0;
@@ -191,10 +191,11 @@ body {
 }
 
 .genre-badge.active {
+  background: var(--lavender);
+  color: #FFFFFF;
   border-width: 4px;
   box-shadow: none;
   transform: translate(2px, 2px);
-  filter: saturate(1.4);
 }
 
 /* ── 추천 버튼 ── */
