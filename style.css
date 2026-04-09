@@ -193,7 +193,8 @@ body {
 .genre-badge.active {
   background: var(--lavender);
   color: #FFFFFF;
-  border-width: 4px;
+  outline: 2px solid #1A1A1A;
+  outline-offset: 0;
   box-shadow: none;
   transform: translate(2px, 2px);
 }
