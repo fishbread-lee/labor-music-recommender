@@ -8,7 +8,7 @@ const QUERY_MAP = {
 };
 
 const GENRE_KEYWORDS = {
-  lofi:      'lofi 감성',
+  lofi:      'lofi chill',
   jazz:      '재즈 보사노바',
   classical: '클래식 음악',
   synth:     '신스팝 일렉트로닉',
