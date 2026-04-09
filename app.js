@@ -169,3 +169,97 @@ function loadPrefs() {
     return null;
   }
 }
+
+// ── 상태 ──
+let selectedWorkType = 'focus';
+let selectedGenres = [];
+
+// ── 초기화 ──
+document.addEventListener('DOMContentLoaded', () => {
+  const slider = document.getElementById('intensity');
+  const intensityLabel = document.getElementById('intensity-label');
+  const workTypeGroup = document.getElementById('work-type');
+  const genreGrid = document.getElementById('genres');
+  const recommendBtn = document.getElementById('recommend-btn');
+  const resultsSection = document.getElementById('results-section');
+  const loadingMsg = document.getElementById('loading-msg');
+  const errorMsg = document.getElementById('error-msg');
+
+  // 슬라이더: 강도 레이블 업데이트
+  slider.addEventListener('input', () => {
+    intensityLabel.textContent = INTENSITY_LABELS[slider.value];
+  });
+
+  // 업무 종류 토글
+  workTypeGroup.addEventListener('click', e => {
+    const btn = e.target.closest('.toggle-btn');
+    if (!btn) return;
+    workTypeGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedWorkType = btn.dataset.value;
+  });
+
+  // 장르 뱃지 멀티 선택
+  genreGrid.addEventListener('click', e => {
+    const badge = e.target.closest('.genre-badge');
+    if (!badge) return;
+    badge.classList.toggle('active');
+    const genre = badge.dataset.genre;
+    if (selectedGenres.includes(genre)) {
+      selectedGenres = selectedGenres.filter(g => g !== genre);
+    } else {
+      selectedGenres.push(genre);
+    }
+  });
+
+  // 추천받기 버튼
+  recommendBtn.addEventListener('click', async () => {
+    const intensity = parseInt(slider.value, 10);
+    const memo = document.getElementById('memo').value;
+
+    savePrefs({ intensity, workType: selectedWorkType, genres: selectedGenres });
+
+    const query = buildQuery(intensity, selectedWorkType, selectedGenres, memo);
+
+    // UI 초기화
+    resultsSection.hidden = false;
+    loadingMsg.hidden = false;
+    errorMsg.hidden = true;
+    document.getElementById('results-grid').innerHTML = '';
+    recommendBtn.disabled = true;
+
+    try {
+      const items = await fetchRecommendations(query);
+      renderResults(items);
+    } catch (err) {
+      showError('API 오류가 발생했어요. API 키와 인터넷 연결을 확인해주세요.');
+      console.error(err);
+    } finally {
+      loadingMsg.hidden = true;
+      recommendBtn.disabled = false;
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  // 취향 복원
+  const prefs = loadPrefs();
+  if (prefs) {
+    if (prefs.intensity) {
+      slider.value = prefs.intensity;
+      intensityLabel.textContent = INTENSITY_LABELS[prefs.intensity];
+    }
+    if (prefs.workType) {
+      workTypeGroup.querySelectorAll('.toggle-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.value === prefs.workType);
+      });
+      selectedWorkType = prefs.workType;
+    }
+    if (Array.isArray(prefs.genres)) {
+      prefs.genres.forEach(g => {
+        const badge = genreGrid.querySelector(`.genre-badge[data-genre="${g}"]`);
+        if (badge) badge.classList.add('active');
+      });
+      selectedGenres = prefs.genres;
+    }
+  }
+});
