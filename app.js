@@ -117,21 +117,23 @@ function renderResults(items) {
  */
 function createCard(item, featured) {
   const videoId = item.id.videoId;
-  const title = item.snippet.title;
+  const title = item.snippet.title ?? '';
+  const thumbnails = item.snippet.thumbnails ?? {};
   const thumb = featured
-    ? (item.snippet.thumbnails.high?.url ?? item.snippet.thumbnails.medium?.url)
-    : item.snippet.thumbnails.medium?.url;
-  const href = `https://www.youtube.com/watch?v=${videoId}`;
+    ? (thumbnails.high?.url ?? thumbnails.medium?.url ?? '')
+    : (thumbnails.medium?.url ?? '');
+  const href = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
 
   const card = document.createElement('div');
   card.className = featured ? 'result-card result-card--featured' : 'result-card';
   card.innerHTML = `
-    <img class="card-thumb" src="${thumb}" alt="${escapeHtml(title)}" loading="lazy">
+    <img class="card-thumb" src="${escapeHtml(thumb)}" alt="${escapeHtml(title)}" loading="lazy">
     <div class="card-body">
       <p class="card-title">${escapeHtml(title)}</p>
-      <a class="card-btn" href="${href}" target="_blank" rel="noopener noreferrer">▶ 열기</a>
+      <a class="card-btn" target="_blank" rel="noopener noreferrer">▶ 열기</a>
     </div>
   `;
+  card.querySelector('.card-btn').setAttribute('href', href);
   return card;
 }
 
