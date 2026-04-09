@@ -3,24 +3,9 @@ const YOUTUBE_API_KEY = 'AIzaSyBAt4pg_N-0mWmZ4NglBoXNLkAlu4PDQcc';
 const INTENSITY_LABELS = { 1: '낮음', 2: '보통', 3: '높음' };
 
 const QUERY_MAP = {
-  // 낮음: 가사 있고 신나는 노래, 빠른 비트
-  1: {
-    focus:    '신나는 노래 가사 빠른 비트',
-    repeat:   '신나는 인기 노래 빠른 템포',
-    creative: '밝고 신나는 노래 가사',
-  },
-  // 보통: 평범한 일반 노래
-  2: {
-    focus:    '인기 노래 가사',
-    repeat:   '인기 노래 배경음악',
-    creative: '감성 노래',
-  },
-  // 높음: 가사 없는 집중 음악
-  3: {
-    focus:    '가사없는 집중 음악 instrumental',
-    repeat:   '집중 공부 음악 가사없음',
-    creative: '잔잔한 집중 배경음악 instrumental',
-  },
+  1: '신나는 노래 가사 빠른 비트',   // 낮음: 신나고 가사 있는 노래
+  2: '인기 노래 감성',               // 보통: 평범한 일반 노래
+  3: '가사없는 집중 음악 instrumental', // 높음: 가사 없는 집중 음악
 };
 
 const GENRE_KEYWORDS = {
@@ -37,22 +22,27 @@ const GENRE_KEYWORDS = {
   rock:      '밴드 락 rock',
 };
 
+/** 이번 주 시드 문자열 반환 (매주 다른 결과 유도) */
+function getWeekSeed() {
+  const now = new Date();
+  const week = Math.ceil(now.getDate() / 7);
+  return `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${week}주`;
+}
+
 /**
  * 업무 입력을 YouTube 검색 쿼리 문자열로 변환한다.
  * @param {number} intensity  1|2|3
- * @param {string} workType   'focus'|'repeat'|'creative'
- * @param {string[]} genres   GENRE_KEYWORDS 키 배열
+ * @param {string|null} genre GENRE_KEYWORDS 키
  * @param {string} memo       자유 텍스트 (선택)
  * @returns {string}
  */
-function buildQuery(intensity, workType, genre, memo) {
-  const base = QUERY_MAP[intensity]?.[workType];
-  if (!base) throw new RangeError(`Invalid intensity "${intensity}" or workType "${workType}"`);
+function buildQuery(intensity, genre, memo) {
+  const base = QUERY_MAP[intensity];
+  if (!base) throw new RangeError(`Invalid intensity "${intensity}"`);
   const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
   const memoPart = (memo ?? '').trim().slice(0, 30);
-  // 장르를 앞에 배치, 플레이리스트/컴필레이션 제외
   const exclude = '-playlist -compilation -mix -"1 hour" -"2 hour"';
-  return [genrePart, base, memoPart, exclude].filter(s => s.length > 0).join(' ');
+  return [genrePart, base, memoPart, getWeekSeed(), exclude].filter(s => s.length > 0).join(' ');
 }
 
 /**
@@ -61,12 +51,15 @@ function buildQuery(intensity, workType, genre, memo) {
  * @returns {Promise<object[]>} snippet 포함 items 배열
  */
 async function fetchRecommendations(query) {
+  const orders = ['relevance', 'rating', 'viewCount'];
+  const order = orders[Math.floor(Math.random() * orders.length)];
+
   const url = new URL('https://www.googleapis.com/youtube/v3/search');
   url.searchParams.set('part', 'snippet');
   url.searchParams.set('type', 'video');
   url.searchParams.set('videoCategoryId', '10');
-  url.searchParams.set('maxResults', '5');
-  url.searchParams.set('order', 'relevance');
+  url.searchParams.set('maxResults', '25');
+  url.searchParams.set('order', order);
   url.searchParams.set('q', query);
   url.searchParams.set('key', YOUTUBE_API_KEY);
 
@@ -76,7 +69,10 @@ async function fetchRecommendations(query) {
     throw new Error(err?.error?.message || `HTTP ${res.status}`);
   }
   const data = await res.json();
-  return data.items ?? [];
+  const items = data.items ?? [];
+
+  // 25개 중 랜덤으로 5개 선택
+  return items.sort(() => Math.random() - 0.5).slice(0, 5);
 }
 
 /**
@@ -177,14 +173,12 @@ function loadPrefs() {
 }
 
 // ── 상태 ──
-let selectedWorkType = 'focus';
 let selectedGenre = null;
 
 // ── 초기화 ──
 document.addEventListener('DOMContentLoaded', () => {
   const slider = document.getElementById('intensity');
   const intensityLabel = document.getElementById('intensity-label');
-  const workTypeGroup = document.getElementById('work-type');
   const genreGrid = document.getElementById('genres');
   const recommendBtn = document.getElementById('recommend-btn');
   const resultsSection = document.getElementById('results-section');
@@ -194,15 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 슬라이더: 강도 레이블 업데이트
   slider.addEventListener('input', () => {
     intensityLabel.textContent = INTENSITY_LABELS[slider.value];
-  });
-
-  // 업무 종류 토글
-  workTypeGroup.addEventListener('click', e => {
-    const btn = e.target.closest('.toggle-btn');
-    if (!btn) return;
-    workTypeGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedWorkType = btn.dataset.value;
   });
 
   // 장르 뱃지 단일 선택
@@ -231,9 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const intensity = parseInt(slider.value, 10);
     const memo = document.getElementById('memo').value;
 
-    savePrefs({ intensity, workType: selectedWorkType, genre: selectedGenre });
+    savePrefs({ intensity, genre: selectedGenre });
 
-    const query = buildQuery(intensity, selectedWorkType, selectedGenre, memo);
+    const query = buildQuery(intensity, selectedGenre, memo);
 
     // UI 초기화
     resultsSection.classList.remove('hidden');
@@ -261,12 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (prefs.intensity) {
       slider.value = prefs.intensity;
       intensityLabel.textContent = INTENSITY_LABELS[prefs.intensity];
-    }
-    if (prefs.workType) {
-      workTypeGroup.querySelectorAll('.toggle-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.value === prefs.workType);
-      });
-      selectedWorkType = prefs.workType;
     }
     if (prefs.genre) {
       const badge = genreGrid.querySelector(`.genre-badge[data-genre="${prefs.genre}"]`);
