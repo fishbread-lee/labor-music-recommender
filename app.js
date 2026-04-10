@@ -1,10 +1,11 @@
 
 const INTENSITY_LABELS = { 1: '낮음', 2: '보통', 3: '높음' };
 
-const QUERY_MAP = {
-  1: '#플리 #플레이리스트 #노래추천',          // 낮음: 제한 없음
-  2: '노동요 #플리 #플레이리스트 #노래추천',   // 보통: 살짝 노동요 방향
-  3: '노동요 집중 #플리 #플레이리스트 #노래추천', // 높음: 집중 힌트만
+// 강도별 에너지 수식어 — 결과를 좁히지 않도록 단순하게 유지
+const INTENSITY_MODIFIERS = {
+  1: '잔잔한',
+  2: '집중',
+  3: '신나는',
 };
 
 const GENRE_KEYWORDS = {
@@ -41,32 +42,47 @@ function seededShuffle(arr, seed) {
 
 /**
  * 업무 입력을 YouTube 검색 쿼리 문자열로 변환한다.
+ * 강도(에너지 수식어) + 장르를 조합하되 키워드를 최소화해 결과가 좁혀지지 않도록 한다.
  * @param {number} intensity  1|2|3
  * @param {string|null} genre GENRE_KEYWORDS 키
  * @param {string} memo       자유 텍스트 (선택)
  * @returns {string}
  */
 function buildQuery(intensity, genre, memo) {
-  const base = QUERY_MAP[intensity];
-  if (!base) throw new RangeError(`Invalid intensity "${intensity}"`);
-  const genrePart = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
-  const hashtags = '#플리 #플레이리스트 #노래추천';
+  const modifier = INTENSITY_MODIFIERS[intensity];
+  if (!modifier) throw new RangeError(`Invalid intensity "${intensity}"`);
+  const genreKeyword = genre ? (GENRE_KEYWORDS[genre] ?? '') : '';
   const memoPart = (memo ?? '').trim().slice(0, 30);
+  const hashtags = '#플리 #플레이리스트 #노래추천';
   const exclude = '-shorts -"1 hour loop" -"2 hour loop"';
-  if (genre) {
-    return [genrePart, hashtags, memoPart, exclude].filter(s => s.length > 0).join(' ');
-  }
-  return [base, memoPart, exclude].filter(s => s.length > 0).join(' ');
+  const base = genreKeyword
+    ? `${modifier} ${genreKeyword} 플레이리스트`
+    : `${modifier} 노래 플레이리스트`;
+  return [base, hashtags, memoPart, exclude].filter(s => s.length > 0).join(' ');
 }
 
 /**
  * YouTube Data API v3 search.list 호출.
+ * 같은 날 같은 쿼리+order는 localStorage 캐시를 사용해 API 호출(100 units)을 절약한다.
  * @param {string} query
  * @returns {Promise<object[]>} snippet 포함 items 배열
  */
 async function fetchRecommendations(query) {
+  const today = new Date().toISOString().slice(0, 10); // "2026-04-10"
   const orders = ['rating', 'viewCount'];
-  const order = orders[Math.floor(Math.random() * orders.length)];
+  // 랜덤 대신 날짜 시드로 결정 → 같은 날 같은 order → 캐시 히트율 상승
+  const order = orders[getDaySeed() % orders.length];
+
+  const cacheKey = `ndr_cache_${today}_${order}_${btoa(encodeURIComponent(query)).slice(0, 32)}`;
+
+  // 캐시 확인
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const items = JSON.parse(cached);
+      if (Array.isArray(items) && items.length > 0) return items;
+    }
+  } catch { /* 무시 */ }
 
   const url = new URL('/api/search', location.origin);
   url.searchParams.set('q', query);
@@ -78,7 +94,17 @@ async function fetchRecommendations(query) {
     throw new Error(err?.error || `HTTP ${res.status}`);
   }
   const data = await res.json();
-  return data.items ?? [];
+  const items = data.items ?? [];
+
+  // 캐시 저장 + 오래된 캐시 정리
+  try {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('ndr_cache_') && !k.includes(today))
+      .forEach(k => localStorage.removeItem(k));
+    localStorage.setItem(cacheKey, JSON.stringify(items));
+  } catch { /* 무시 */ }
+
+  return items;
 }
 
 /**
